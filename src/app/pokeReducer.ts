@@ -28,7 +28,7 @@ type PokeDexPickAction = {
 }
 
 /**
- * Generates a pokemon ID from 1-200
+ * Generates a pokemon ID from 1-500
  */
 const randomPokemonId = () => {
     return Math.floor(Math.random() * 500) + 1;
@@ -53,6 +53,8 @@ export const initialState: PokeDexState = {
 export type PokeDexAction = PokeDexLoadingAction | PokeDexNewPokemonAction | PokeDexErrorAction | PokeDexPickAction;
 export type PokeReducer = Reducer<PokeDexState, PokeDexAction>;
 
+// EX: useReducer logic
+// Actions dispatched by the component are called here.
 export function reducer(state: PokeDexState, action: PokeDexAction) {
     switch(action.type) {
         case 'POKEDEX.LOADING':

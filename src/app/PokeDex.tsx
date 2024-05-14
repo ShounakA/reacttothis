@@ -2,19 +2,32 @@
 
 import { useReducer, useEffect, useRef, useState } from "react";
 import { FaPlay, FaRedo } from "react-icons/fa";
-import { PokeReducer, reducer, initialState, newPokeDexLoadAction, newPokeDexNewPokemonAction, newPokeDexErrorAction } from "./pokeReducer";
+import { 
+  PokeReducer, 
+  reducer, 
+  initialState, 
+  newPokeDexLoadAction, 
+  newPokeDexNewPokemonAction, 
+  newPokeDexErrorAction 
+} from "./pokeReducer";
 import { getDescriptionSound, loadPokeDexData } from "./services";
+import { toast } from "react-toastify";
 
 type SpeechPlayerProps = {
     ttsMessage: string
 }
   
 const TextToSpeechPlayer = ({ttsMessage}: SpeechPlayerProps) => {
+    
+    // EX: useRef
     const playerRef = useRef<HTMLAudioElement>(null);
+    // EX: useState
     const [tts, setTts] = useState<string | undefined>();
     const [ready, setReady] = useState(false);
   
-    // Re-render when there is a new ttsMessage
+    // EXAMPLE: On Mount
+    // EXAMPLE: On Destroy
+    // EXAMPLE: Sync with External(REST APIs and audio/video API)
     useEffect(() => {
       const cancellerService = new AbortController();
       const cancelSignal = cancellerService.signal;
@@ -23,16 +36,18 @@ const TextToSpeechPlayer = ({ttsMessage}: SpeechPlayerProps) => {
         .then(objUrl => {
           setTts(objUrl);
           playerRef.current?.load()
-          setReady(true)
+          setReady(true);
+          toast('Speech ready!')
         });
       }
       return () => {
         if (tts) URL.revokeObjectURL(tts);
-        cancellerService.abort('Component re-rendering')
+        cancellerService.abort('Canceling: Component re-rendering')
       }
-    }, [ttsMessage]);
+    }, [ttsMessage, tts]);
   
     return <>
+      { /* useRef binding */}
       <audio ref={playerRef} src={tts}></audio>
       <button onClick={() => playerRef.current?.play()} disabled={!ready}><FaPlay/></button>
       <br/>
@@ -40,6 +55,7 @@ const TextToSpeechPlayer = ({ttsMessage}: SpeechPlayerProps) => {
 }
   
 export function PokeDex() {
+  // Example: useReducer
   const [state, dispatch] = useReducer<PokeReducer>(reducer, initialState);
   const pokemonIsReady = (pokemonElements: JSX.Element) => !state.loading ? pokemonElements : null;
   
@@ -69,6 +85,7 @@ export function PokeDex() {
       cancellerService.abort('Component re-render')
     }
   }, [state.speciesId]);
+
   return (
     <div className="m-2 h-64 w-64 border-2 rounded-2xl bg-primary border-secondary">
           { pokemonIsReady(
@@ -95,8 +112,4 @@ export function PokeDex() {
           )}
     </div>
     );
-}
-
-export function PokemonRoster() {
-  
 }
